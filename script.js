@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	
     map = L.map('map', {
         minZoom: 2,
-        maxZoom: 20
+        maxZoom: 18
     }).setView([52.22977, 21.01178], 7);
 
 		// Define both base layers
@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	const esriImageryLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
 	  attribution: 'Tiles &copy; Esri &mdash; Source: Esri, Maxar, Earthstar, and others',
-	  maxZoom: 20
+	  maxZoom: 18
 	});
 
 	// Add one by default
@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     markerLayer.addTo(map);
 
-    map.locate({setView: true, maxZoom: 20, watch: true}); // Continuously watch for changes in position
+    //map.locate({setView: true, maxZoom: 18, watch: true}); // Continuously watch for changes in position
 
     map.on('click', function(e) {
         updateCoordinates(e.latlng);
@@ -150,73 +150,9 @@ function addWaypointFromData(lat, lng, description) {
 }
 
 function getCurrentPosition() {
-    map.locate({setView: true, maxZoom: 20});
+    map.locate({setView: true, maxZoom: 18});
 }
 
-var cameraEnabled = false;
-var localStream = null;
-
-document.getElementById('toggleCamera').addEventListener('click', function() {
-    if (!cameraEnabled) {
-        enableCamera();
-    } else {
-        disableCamera();
-    }
-});
-
-function enableCamera() {
-    var video = document.getElementById('video');
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        navigator.mediaDevices.getUserMedia({
-            video: {
-                facingMode: { exact: "environment" }
-            }
-        })
-        .then(function(stream) {
-            video.srcObject = stream;
-            localStream = stream;
-            video.style.display = 'block';
-            document.getElementById('capturePhoto').style.display = 'inline';
-            document.getElementById('toggleCamera').textContent = 'Disable Camera';
-            cameraEnabled = true;
-        })
-        .catch(function(error) {
-            console.log("Something went wrong when accessing the camera!", error);
-        });
-    }
-}
-
-function disableCamera() {
-    if (localStream) {
-        localStream.getTracks().forEach(track => track.stop());
-    }
-    var video = document.getElementById('video');
-    video.style.display = 'none';
-    document.getElementById('capturePhoto').style.display = 'none';
-    document.getElementById('toggleCamera').textContent = 'Enable Camera';
-    cameraEnabled = false;
-}
-
-function capturePhoto() {
-    var canvas = document.getElementById('canvas');
-    var context = canvas.getContext('2d');
-    var video = document.getElementById('video');
-    context.drawImage(video, 0, 0, 320, 240);
-    document.getElementById('savePhotoButton').style.display = 'inline';
-}
-
-function savePhoto() {
-    var canvas = document.getElementById('canvas');
-    var image = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
-    var lat = document.getElementById('latitude').value;
-    var lng = document.getElementById('longitude').value;
-    var description = "Photo taken at: " + lat + ", " + lng;
-
-    var marker = L.marker([parseFloat(lat), parseFloat(lng)]).addTo(markerLayer);
-    marker.bindPopup("<img src='" + image + "' style='width:200px;'>").openPopup();
-    waypoints.push({ latitude: lat, longitude: lng, description: description, image: image });
-    document.getElementById('savePhotoButton').style.display = 'none';
-}
 
 // Sidebar functionality
 
