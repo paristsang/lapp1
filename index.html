@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Waypoint Recorder</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.2/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.2/dist/leaflet.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.7.6/proj4.min.js"></script>
+	<script>
+	  proj4.defs("EPSG:2100", "+proj=tmerc +lat_0=0 +lon_0=24 +k=0.9996 +x_0=500000 +y_0=0 +ellps=GRS80 +units=m +no_defs");
+	</script>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <svg xmlns="http://www.w3.org/2000/svg" style="display: none">
+        <symbol id="icon-arrow-left" viewBox="0 0 21 21">
+            <path d="M15.422 16.594 14.016 18l-6-6 6-6 1.406 1.406L10.828 12z" />
+        </symbol>
+        <symbol id="icon-clear" viewBox="0 0 21 21">
+            <path d="M18.984 6.422 13.406 12l5.578 5.578-1.406 1.406L12 13.406l-5.578 5.578-1.406-1.406L10.594 12 5.016 6.422l1.406-1.406L12 10.594l5.578-5.578z" />
+        </symbol>
+        <symbol id="icon-email" viewBox="0 0 21 21">
+            <path d="M20.016 8.016V6L12 11.016 3.984 6v2.016L12 12.985zm0-4.032q.797 0 1.383.609t.586 1.406v12q0 .797-.586 1.406t-1.383.609H3.985q-.797 0-1.383-.609t-.586-1.406v-12q0-.797.586-1.406t1.383-.609h16.031z" />
+        </symbol>
+        <symbol id="icon-menu" viewBox="0 0 21 21">
+            <path d="M3 13h18a1 1 0 0 0 0-2H3a1 1 0 0 0 0 2zm0-6h18a1 1 0 0 0 0-2H3a1 1 0 0 0 0 2zm0 12h18a1 1 0 0 0 0-2H3a1 1 0 0 0 0 2z" />
+        </symbol>
+        <symbol id="icon-person" viewBox="0 0 21 21">
+            <path d="M12 14.016q2.531 0 5.273 1.102t2.742 2.883v2.016H3.984v-2.016q0-1.781 2.742-2.883t5.273-1.102zM12 12q-1.641 0-2.813-1.172T8.015 8.015t1.172-2.836T12 3.984t2.813 1.195 1.172 2.836-1.172 2.813T12 12z" />
+        </symbol>
+        <symbol id="icon-settings" viewBox="0 0 21 21">
+            <path d="M12 15.516q1.453 0 2.484-1.031t1.031-2.484-1.031-2.484T12 8.486 9.516 9.517t-1.031 2.484 1.031 2.484T12 15.516zm7.453-2.532 2.109 1.641q.328.234.094.656L19.64 18.75q-.188.328-.609.188l-2.484-.984q-.984.703-1.688.984l-.375 2.625q-.094.422-.469.422H9.984q-.375 0-.469-.422l-.375-2.625q-.891-.375-1.688-.984l-2.484.984q-.422.141-.609-.188l-2.016-3.469q-.234-.422.094-.656l2.109-1.641q-.047-.328-.047-.984t.047-.984L2.437 9.375q-.328-.234-.094-.656L4.359 5.25q.188-.328.609-.188l2.484.984q.984-.703 1.688-.984l.375-2.625q.094-.422.469-.422h4.031q.375 0 .469.422l.375 2.625q.891.375 1.688.984l2.484-.984q.422-.141.609.188l2.016 3.469q.234.422-.094.656l-2.109 1.641q.047.328.047.984t-.047.984z" />
+        </symbol>
+		<symbol id="icon-camera" viewBox="0 0 21 21">
+        <path d="M20 5h-3l-1-1h-8l-1 1H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm-8 13c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+    </symbol>
+	<symbol id="icon-record-waypoint" viewBox="0 0 21 21">
+        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 18.3C9.4 16.92 7 12.75 7 9c0-2.76 2.24-5 5-5s5 2.24 5 5c0 3.75-2.4 7.92-5 11.3zM11 6h2v6h-2zM11 14h2v2h-2z"/>
+    </symbol>
+	<symbol id="icon-get-position" viewBox="0 0 21 21">
+        <path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3A8.994 8.994 0 0 0 13 3.06V1h-2v2.06A8.994 8.994 0 0 0 3.06 11H1v2h2.06A8.994 8.994 0 0 0 11 20.94V23h2v-2.06A8.994 8.994 0 0 0 20.94 13H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/>
+    </symbol>
+	<symbol id="icon-download-waypoints" viewBox="0 0 21 21">
+        <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5"/>
+  <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708z"/>
+    </symbol>
+	<symbol id="icon-upload-waypoints" viewBox="0 0 21 21">
+	  <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5"/>
+	  <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708z"/>
+	</symbol>
+	<symbol id="icon-book" viewBox="0 0 24 24">
+		<path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12v-2H6V4h12v5h2V4c0-1.1-.9-2-2-2z"/>
+	</symbol>
+	<symbol id="icon-speed" viewBox="0 0 24 24">
+		<path d="M12 4a8 8 0 1 1-5.66 13.66l-2.12 2.12-1.41-1.41 2.12-2.12A8 8 0 0 1 12 4zm0 2a6 6 0 1 0 4.24 10.24l1.42 1.42a8 8 0 1 1-11.31-11.31l1.42 1.42A6 6 0 0 0 12 6zm1 5V7h-2v4h2zm0 2h-2v2h2v-2z"/>
+	</symbol>
+
+
+
+    </svg>
+    <div class="sidebar">
+        <button aria-label="close sidebar" type="button" class="close-button">
+            <svg>
+                <use xlink:href="#icon-clear" />
+            </svg>
+        </button>
+
+        <ul class="sidebar-menu">
+            <li class="menu-item" data-item="position2">
+			<svg>
+                <use xlink:href="#icon-menu" />
+            </svg>
+			</li>
+
+            <li class="menu-item" data-item="record">
+			<svg>
+                <use xlink:href="#icon-record-waypoint" />
+            </svg>
+			</li>
+            <li class="menu-item" data-item="download"><svg>
+                <use xlink:href="#icon-download-waypoints" />
+            </svg></li>
+            
+			<li class="menu-item" data-item="upload">
+			<svg>
+                <use xlink:href="#icon-upload-waypoints" />
+            </svg>			              
+            </li>
+            <li class="menu-item" id="toggleCamera" data-item="camera">
+			<svg>
+                <use xlink:href="#icon-book" />
+            </svg>
+			</li>
+			           
+			<li class="menu-item" id="capture" style="display:none;" data-item="capture">Capture Photo</li>
+            <li class="menu-item" id="savePhoto" style="display:none;" data-item="save">Save Photo</li>
+			
+			<li class="menu-item" data-item="lavrio">
+			<svg>
+				<use xlink:href="#icon-person" /> <!-- or a new icon if you prefer -->
+			</svg>
+			</li>
+        </ul>
+
+        <div class="sidebar-content">
+            <div class="item-content" id="position">
+                <h2>Get Position</h2>
+                <div class="content">
+                    <button onclick="getCurrentPosition()">Get Current Position</button>
+                </div>
+            </div>
+            <div class="item-content" id="record">
+                <h2>Record Waypoint</h2>
+                <div class="content">
+                    <form id="dataForm">
+                        <label for="latitude">Latitude:</label>
+                        <input type="text" id="latitude" name="latitude" readonly><br>
+                        <label for="longitude">Longitude:</label>
+                        <input type="text" id="longitude" name="longitude" readonly><br>
+                        <label for="accuracy">Accuracy (meters):</label>
+                        <input type="text" id="accuracy" name="accuracy" readonly><br>
+						<label for="elevation">Elevation (meters):</label>
+						<input type="text" id="elevation" name="elevation" readonly><br>
+                        <label for="description">Description:</label>
+                        <textarea id="description" name="description"></textarea><br>
+                        <button type="button" onclick="addWaypoint()">Record Waypoint</button>
+                    </form>
+                </div>
+            </div>
+            <div class="item-content" id="download">
+                <h2>Download Waypoints</h2>
+                <div class="content">
+                    <button onclick="downloadWaypoints()">Download Waypoints</button>
+                </div>
+            </div>
+            <div class="item-content" id="camera">
+                <h2>Info</h2>
+			<div class="content" style="height: 600px; overflow-y: auto;">
+				<iframe src="info.html" width="100%" height="550" style="border: none;"></iframe>
+			</div>                
+            </div>
+			<div class="item-content" id="speed">
+                <h2>Motion Analysis</h2>
+			<div class="content" style="height: 600px; overflow-y: auto;">
+				<iframe src="gnss.html" width="100%" height="550" style="border: none;"></iframe>
+			</div>                
+            </div>
+			
+			<div class="item-content" id="upload">
+				<h2>Upload Waypoints</h2>
+				<div class="content">
+					<label for="uploadJson" class="primary icon-button fileInputLabel">
+						Upload Waypoints
+					</label>
+					<input type="file" id="uploadJson" accept=".json" onchange="uploadWaypoints()" class="fileInput">
+				</div>
+			</div>
+
+			<div class="item-content" id="lavrio">
+			  <h2>Chaos at Lavrio</h2>
+			  <div class="content" style="height: 600px; overflow-y: auto;">
+				<iframe src="index_video.html" width="100%" height="550" style="border: none;"></iframe>
+			  </div>
+			</div>			
+        </div>
+    </div>
+    <div id="map"></div>
+    <script src="script.js"></script>
+</body>
+</html>

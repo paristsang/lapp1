@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chaos at Lavrio</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: 'Roboto', sans-serif;
+      background-color: #f4f4f9;
+      color: #333;
+    }
+    header {
+      background: linear-gradient(to right, #212121, #424242);
+      color: white;
+      padding: 2rem;
+      text-align: center;
+    }
+    main {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 1.5rem;
+    }
+    section {
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    h1, h2 {
+      margin-top: 0;
+    }
+    img, video {
+      width: 100%;
+      border-radius: 8px;
+      margin-top: 1rem;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #ccc;
+      margin: 1rem 0;
+    }
+    ul {
+      padding-left: 1.2rem;
+    }
+    ul li {
+      margin-bottom: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Chaos at Lavrio</h1>
+    <p>3D model</p>
+	<p> Processing Panos Karamanolis </p>
+  </header>
+
+  <main>
+    <section>
+      <h2>Snapshot #1</h2>
+      <img src="lavrio-snapshot1.png" alt="3D terrain view of Lavrio chaos area" />
+    </section>
+
+    <section>
+      <h2>Live Footage</h2>
+	  
+      <video controls>
+        <source src="lavrio-chaos.mp4" type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
+    </section>
+
+    <section>
+      <h2>Snapshot #2</h2>
+      <img src="lavrio-snapshot3.png" alt="3D terrain view of Lavrio chaos area" />
+    </section>
+
+    <section>
+      <h2>Δημιουργία Snapshot & 3D Μοντέλου με Drone και Agisoft Metashape</h2>
+      <h3>Εναέρια αποτύπωση με drone</h3>
+      <ul>
+        <li>Πτήση με προκαθορισμένη διαδρομή (flight path) πάνω από την περιοχή του Λαυρίου.</li>
+        <li>Συλλογή φωτογραφιών με μεγάλη επικάλυψη (80%–90%) τόσο οριζόντια όσο και κάθετα (nadir & oblique shots).</li>
+        <li>Χρήση GPS υψηλής ακρίβειας για γεωαναφορά (georeferencing).</li>
+      </ul>
+      <h3>Επεξεργασία στο Agisoft Metashape</h3>
+      <ul>
+        <li>Εισαγωγή φωτογραφιών και ευθυγράμμιση (Align Photos).</li>
+        <li>Δημιουργία sparse και dense cloud (πυκνό σύννεφο σημείων).</li>
+        <li>Κατασκευή 3D mesh από το dense cloud.</li>
+        <li>Εφαρμογή texture mapping για ρεαλιστική απεικόνιση.</li>
+        <li>Εξαγωγή σε snapshot, ortho-mosaic, DEM ή 3D μορφές (OBJ/PLY/GLB).</li>
+      </ul>
+    </section>
+
+	
+  </main>
+</body>
+</html>
